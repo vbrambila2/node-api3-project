@@ -23,7 +23,7 @@ router.get('/', (req, res) => {
 router.get('/:id', validateUserId, (req, res, next) => {
   // RETURN THE USER OBJECT
   // this needs a middleware to verify user id
-  res.json(req.user);
+  res.json(req.existingUser);
 });
 
 router.post('/', validateUser, (req, res, next) => {
@@ -40,19 +40,23 @@ router.put('/:id', validateUserId, validateUser, (req, res, next) => {
   // RETURN THE FRESHLY UPDATED USER OBJECT
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
+
   Users.update(req.params.id, req.user)
+    // .then(() => {
+    //   return Users.getById(req.params.id);
+    // })
     .then(() => {
-      res.status(200).json({ ...req.user.id, ...req.user });
+      res.json({ ...req.existingUser, ...req.user });
     })
-    .catch(error => next({ error }));
+    .catch(next);
 });
 
 router.delete('/:id', validateUserId, (req, res, next) => {
   // RETURN THE FRESHLY DELETED USER OBJECT
   // this needs a middleware to verify user id
-  Users.remove(req.user.id)
+  Users.remove(req.existingUser.id)
     .then(() => {
-      res.status(200).json(req.user);
+      res.status(200).json(req.existingUser);
     })
     .catch(error => next({ error }));
 });
@@ -72,7 +76,7 @@ router.post('/:id/posts', validateUserId, validatePost, (req, res, next) => {
   // this needs a middleware to verify user id
   // and another middleware to check that the request body is valid
   const postInfo = { text: req.body.text, user_id: req.params.id };
-  console.log(postInfo);
+
   Posts.insert(postInfo)
     .then(post => {
       res.status(201).json(post);

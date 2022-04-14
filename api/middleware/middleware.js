@@ -13,7 +13,7 @@ function validateUserId(req, res, next) {
   User.getById(req.params.id)
     .then(user => {
       if(user) {
-        req.user = user;
+        req.existingUser = user;
         next();
       } else {
         res.status(404).json({ message: "user not found" });
