@@ -19,20 +19,30 @@ function validateUserId(req, res, next) {
         res.status(404).json({ message: "user not found" });
       }
     })
+    .catch(() => {
+      res.status(500).json({ message: '500 error' })
+    })
 }
 
 function validateUser(req, res, next) {
   // DO YOUR MAGIC
   if (typeof req.body.name !== 'string' || req.body.name.trim() === '') {
-    res.status(400).json({ message: "missing required name field" })
+    res.status(400).json({ message: "missing required name field" });
+    return;
   }
+
+  req.user = { name: req.body.name.trim() };
+  next();
 }
 
 function validatePost(req, res, next) {
   // DO YOUR MAGIC
   if(typeof req.body.text !== 'string' || req.body.text.trim() === '') {
     res.status(400).json({ message: "missing required text field" })
+    return;
   }
+
+  next();
 }
 
 // do not forget to expose these functions to other modules
